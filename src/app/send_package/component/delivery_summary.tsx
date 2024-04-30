@@ -1,5 +1,5 @@
 import { useAppSelector } from "@/lib/store";
-import { useAppSelector as authSelector} from "@/lib/store/auth_store" ;
+import { useAppSelector as authSelector, useAppDispatch as dispatch} from "@/lib/store/auth_store" ;
 import { Card } from "flowbite-react";
 import SenderForm from "./sender_form";
 import { getDatabase,set, ref,push } from "firebase/database";
@@ -8,26 +8,28 @@ import { getAuth, signInAnonymously } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { ItemDetails } from "@/lib/model/packag_details";
 import clsx from "clsx";
+import { setAuthToken } from "@/lib/store/authSlice";
 //import { auth } from "firebaseui" ;
-
 export default function DeliverySummary(){
     const receiver = useAppSelector((state)=>state.item);
     const user =  authSelector((state)=>state.auth);
-    const [code, setCode] = useState('');
-    const [userID, seUserID] = useState('');
-   const generateUniqueCode = ()=>{
+   // const [code, setCode] = useState('');
+    //const [userID, seUserID] = useState('');
+    const [status, setSatus]  = useState('');
+   // const [senderName, s]
+   var isLogin = localStorage.getItem('isAuthenticated');
+   console.log(isLogin)
     const date = new Date();
      let day = date.getDate()
      let month =  date.getMonth()+1.
      let year = date.getFullYear();
-     let timeCode = JSON.stringify(receiver.reciever.address.state) + JSON.stringify(receiver.reciever.address.city);
+    //let timeCode = JSON.stringify(receiver.reciever.address.state.substring(0,1)) + JSON.stringify(receiver.reciever.address.city.substring(0,3));
     const randomCode = Math.floor(10000 + Math.random() * 90000);
-    const code = timeCode + day + month + year+ randomCode.toString();
-    setCode(code)
-   }
-let status;
+    const codes = (day + month + year+ randomCode).toString();
+   // setCode(codes)
+   const dsp = dispatch();
    const order: ItemDetails ={
-    tracking_id: code,
+    tracking_id: codes,
     item_type:receiver.item_type,
     item_count: receiver.item_count,
     item_value: receiver.item_value,
@@ -54,18 +56,19 @@ let status;
             address: receiver.reciever.address.address
         },
         phone: receiver.reciever.phone,
-        email: receiver.reciever.email,
+      //  email: receiver.reciever.email,
     }
    }
+
 const  saveItemWithAnonymous=(()=>{
     const auth = getAuth(app);
     signInAnonymously(auth)
-    .then(()=>{
-    
-
-        const db = getDatabase(app);
-
-set(ref(db,'orders/' + code+'/'+userID),{
+    .then((result)=>{
+    dsp(setAuthToken(result.user.uid))
+const uid = result.user.uid;
+        const db =getDatabase(app);
+setSatus( 'success');
+set(ref(db,'orders/'+uid),{
     order
     
 
@@ -91,9 +94,10 @@ set(ref(db,'orders/' + code+'/'+userID),{
     <li className="mb-10 ms-4 flex-wrap">
         <div className="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
         <time className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">From</time>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Taiwo Lawal</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{receiver.sender.sender_name}</h3>
 
-        <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">ABC street, Oyo Ibadan.</p>
+        <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">{receiver.reciever.address.address}, {receiver.pickup_location.city}
+        </p>
         
     </li>
     <li className="mb-10 ms-4 flex-wrap">
@@ -111,8 +115,8 @@ set(ref(db,'orders/' + code+'/'+userID),{
 
 <h4 className="text-sm text-center font-semibold text-gray-900 dark:text-white pt-4">Sender Details</h4>
 <SenderForm></SenderForm>
-<div className="relative w-auto p-2">
-            <input type="text" id="search-dropdown" className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg rounded-s-gray-100 rounded-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter Coupon" />
+<div className="relative w-auto">
+            <input type="text" id="search-dropdown" className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg rounded-s-gray-100 rounded-s-2 border border-gray-300 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-orange-500" placeholder="Enter Coupon" />
             <button  className="absolute top-0 end-0 p-2.5 h-full text-sm font-medium text-white bg-neutral-800 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4">
   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -121,22 +125,32 @@ set(ref(db,'orders/' + code+'/'+userID),{
 
             </button>
         </div>
+        <div className={clsx(
+            'block',
+            {
+            'hidden':isLogin
+        })}>
         <p id="helper-text-explanation" 
         className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Create Account To Keep Track of Your Delivery records.
+            Create Account To for seameless experience.
 </p>
 
         <div className="grid grid-rows-2 gap-2">
-            <a href="/create_account" type="button" className="text-white bg-orange-500 hover:bg-orange-600 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center  dark:focus:ring-orange-600 dark:bg-orange-500 dark:border-orange-700 dark:text-white dark:hover:bg-orange-700 me-2 mb-2 ">
+            <a href="/create_account" type="button" 
+            className="text-white bg-orange-500 hover:bg-orange-600 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center  dark:focus:ring-orange-600 dark:bg-orange-500 dark:border-orange-700 dark:text-white dark:hover:bg-orange-700 me-2 mb-2 "
+            >
             Create Account &amp; Book Delivery
             </a>
        
-<button  type="button" className="text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center  dark:focus:ring-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 me-2 mb-2">
+<button  type="button" onClick={()=>{
+    saveItemWithAnonymous()
+}}
+className="text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center  dark:focus:ring-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 me-2 mb-2">
 
 Just Book Delivery
 </button>
         </div>
-
+        </div>
         </Card>
 <div id="toast-success" className={
     clsx(

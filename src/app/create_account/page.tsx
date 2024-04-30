@@ -40,8 +40,8 @@ export default function SignUpForm(){
             <div className="p-4 md:p-5">
                 <form className="space-y-4" onSubmit={(e)=>{
                     e.preventDefault();
+                    createAccount();
                     createNewUserWithEmailAndPassword(email, password);
-                //createAccount();
                 }}>
                     <div>
                         <label  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
@@ -75,9 +75,9 @@ export default function SignUpForm(){
                         </div>
                        {/* <a href="#" className="text-sm text-orange-600 hover:underline dark:text-blue-500">Lost Password?</a>*/}
                     </div>
-                    <button type="submit" className="w-full text-white bg-orange-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-orange-600 dark:focus:ring-blue-800">Login to your account</button>
+                    <button type="submit" className="w-full text-white bg-orange-600 hover:bg-orange-700 focus:ring-4 focus:outline-none focus:ring-orange-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-orange-600 dark:hover:bg-orange-600 dark:focus:ring-orange-800">Login to your account</button>
                     <div className="text-sm font-medium text-gray-500 dark:text-gray-300">
-                        Have an Account? <a href="#" className="text-orange-600 hover:underline dark:text-blue-500">Login here</a>
+                        Have an Account? <a href="/login" className="text-orange-600 hover:underline dark:text-blue-500">Login here</a>
                     </div>
                 </form>
             </div>

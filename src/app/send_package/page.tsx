@@ -6,6 +6,7 @@ import ReceiverDetail from './component/receiver_detail';
 import PackageDetail from './component/package_detail';
 import ReduxProvider from '@/lib/store/redux-provider';
 import {app} from '@/lib/firebase_config';
+
 import { getDatabase } from 'firebase/database';
 
 
