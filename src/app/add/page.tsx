@@ -1,13 +1,13 @@
 'use client';
 import { useState} from 'react';
-import DeliverySummary from './component/delivery_summary';
+import ScheduleDeliverySummary from './component/delivery_summary';
 import { clsx } from 'clsx';
-import ReceiverDetail from './component/receiver_detail';
-import PackageDetail from './component/package_detail';
+import ScheduleReceiverDetail from './component/receiver_detail';
+import SchedulePackageDetail from './component/package_detail';
+//import {app} from '@/lib/firebase_config';
 import ReduxProvider from '@/lib/store/redux-provider';
-import {app} from '@/lib/firebase_config';
 
-import { getDatabase } from 'firebase/database';
+//import { getDatabase } from 'firebase/database';
 
 
 
@@ -15,7 +15,7 @@ export default function SendPackage(){
     //The number of steps for the stepper
     const [index, setIndex] = useState(0);
     //navigate forward
-    const [isSubmit, setIssumbmit] = useState(false);
+    //const [isSubmit, setIssumbmit] = useState(false);
     function nextIndex(){
         setIndex(index+1)
     }
@@ -26,13 +26,13 @@ export default function SendPackage(){
 return(
     <ReduxProvider>
 <div className='max-w-sm md:max-w-2xl lg:max-w-2xl mx-auto overflow-x-hidden'>
-<span className='pt-2' onClick={()=>{location.replace('dashboard')}}>
-   
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+    <span className='p-2' onClick={()=>{location.replace('dashboard')}}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
   <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
   <path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
 </svg>
 
+  
  
   </span>
 <ol className="flex items-center w-full p-3 space-x-2 text-sm font-medium text-center text-gray-500 bg-white border border-gray-200 rounded-lg shadow-sm dark:text-gray-400 sm:text-base dark:bg-gray-800 dark:border-gray-700 sm:p-4 sm:space-x-4 rtl:space-x-reverse">
@@ -85,7 +85,7 @@ return(
     'block':index == 0,
     'hidden': index !=0   
 })}>
-    <PackageDetail/>
+    <SchedulePackageDetail/>
     <button  onClick={()=>{setIndex(index+1)
     }}
      className="mt-4 text-white bg-orange-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Next</button>
@@ -96,7 +96,7 @@ return(
     'block':index == 1,
     'hidden': index !=1   
 })}>
-    <ReceiverDetail/>
+    <ScheduleReceiverDetail/>
 
     <div className=''>
     <button  onClick={()=>{prevIndex()}}
@@ -112,7 +112,7 @@ return(
     'block':index == 2,
     'hidden': index !=2   
 })}>
-    <DeliverySummary />
+    <ScheduleDeliverySummary />
 {/*<div className=''>
     <button  onClick={()=>{prevIndex(),
          setIssumbmit(!true);
@@ -129,9 +129,5 @@ return(
 );
 
 
-}
-function save_to_db(){
-
-    const db =getDatabase(app);
 }
 

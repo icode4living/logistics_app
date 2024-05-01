@@ -1,38 +1,46 @@
+'use client';
 import { useAppSelector } from "@/lib/store";
-//import { useAppSelector as authSelector, useAppDispatch as dispatch} from "@/lib/store/auth_store" ;
 import { Card } from "flowbite-react";
-import SenderForm from "./sender_form";
+//import SenderForm from "./sender_form";
 import { getDatabase,set, ref,push } from "firebase/database";
 import { app } from "@/lib/firebase_config";
 import { getAuth, signInAnonymously } from "firebase/auth";
-import { useEffect, useState } from "react";
-import { ItemDetails } from "@/lib/model/packag_details";
+import { useState } from "react";
+import { ItemDetails,SenderDetails } from "@/lib/model/packag_details";
 import clsx from "clsx";
-//import { setAuthToken } from "@/lib/store/authSlice";
+//import {useNavigate} from 'react-router-dom';
 //import { auth } from "firebaseui" ;
 const auth = getAuth(app);
-const user = auth.currentUser;
-export default function DeliverySummary(){
-   
+   const user = auth.currentUser;
+export default function ScheduleDeliverySummary(){
     const receiver = useAppSelector((state)=>state.item);
-  //  const user =  authSelector((state)=>state.auth);
-   // const [code, setCode] = useState('');
-    //const [userID, seUserID] = useState('');
-    const [status, setSatus]  = useState('');
     const [uid, setUid] = useState('');
-
-   // const [senderName, s]
-   //var isLogin = localStorage.getItem('isAuthenticated');
-   //console.log(isLogin)
+    const [fname, setFname] = useState('');
+    const [mobileNumber, setPMobileNumber] = useState('');
+   
     const date = new Date();
      let day = date.getDate()
      let month =  date.getMonth()+1.
      let year = date.getFullYear();
     //let timeCode = JSON.stringify(receiver.reciever.address.state.substring(0,1)) + JSON.stringify(receiver.reciever.address.city.substring(0,3));
-    const randomCode = Math.floor(10000 + Math.random() * 90000);
-    const codes = (day + month + year+ randomCode).toString();
+    const randomCode = Math.floor(100000 + Math.random() * 900000);
+    const codes =day + month + year+randomCode.toString();
    // setCode(codes)
-  //const dsp = dispatch();
+   //const dsp = dispatch();
+   
+  
+   if (user !== null) {
+    user.providerData.forEach((profile) => {
+      console.log("Sign-in provider: " + profile.providerId);
+      console.log("  Provider-specific UID: " + profile.uid);
+      console.log("  Name: " + profile.displayName);
+      console.log("  Email: " + profile.email);
+      console.log("  Photo URL: " + profile.photoURL);
+      setUid(JSON.stringify(profile.uid));
+    
+    });
+}
+console.log('uid=>',uid)
    const order: ItemDetails ={
     tracking_id: codes,
     item_type:receiver.item_type,
@@ -42,10 +50,10 @@ export default function DeliverySummary(){
     description: receiver.description,
     note: receiver.note,
     sender:{
-      sender_id: receiver.sender.sender_id,
-      sender_name: receiver.sender.sender_name,
-    sender_phone: receiver.sender.sender_phone,
-    sender_email: receiver.sender.sender_email,
+      sender_id: uid,
+      sender_name:fname,
+    sender_phone: mobileNumber,
+    sender_email: uid,
     },
     pickup_location:{
         address: receiver.pickup_location.address,
@@ -62,28 +70,21 @@ export default function DeliverySummary(){
         },
         phone: receiver.reciever.phone,
       //  email: receiver.reciever.email,
-    }
-   }
-   if (user !== null) {
-    user.providerData.forEach((profile) => {
-      console.log("Sign-in provider: " + profile.providerId);
-      console.log("  Provider-specific UID: " + profile.uid);
-      console.log("  Name: " + profile.displayName);
-      console.log("  Email: " + profile.email);
-      console.log("  Photo URL: " + profile.photoURL);
-      setUid(JSON.stringify(profile.uid));
+      
+    },
+    schedule_date:receiver.schedule_date
     
-    });
-}
+   }
+
 const  saveItemWithAnonymous=(()=>{
     const auth = getAuth(app);
     signInAnonymously(auth)
     .then((result)=>{
-   // dsp(setAuthToken(result.user.uid))
-const uid = result.user.uid;
+  //  dsp(setAuthToken(result.user.uid))
+//const uid = result.user.uid;
         const db =getDatabase(app);
-setSatus( 'success');
-set(ref(db,'orders/'+uid),{
+//setSatus( 'success');
+set(ref(db,'orders/'+uid+'/'+ codes.toString()),{
     order
     
 
@@ -97,6 +98,23 @@ set(ref(db,'orders/'+uid),{
     })
 
 })
+const  saveItem=(()=>{
+   console.log(order)
+   //const uid = result.user.uid;
+        const db =getDatabase(app);
+ set(ref(db,'orders/'+uid+'/'+codes.toString()),{
+    order
+   
+   
+}).then(()=>{
+    //setSatus('success')
+    alert("Delivery booked! Your order number is "+ codes),
+    localStorage.setItem('order_number', codes);
+})
+
+    })
+
+
     
     
     
@@ -128,8 +146,31 @@ set(ref(db,'orders/'+uid),{
 </Card>
 <Card className="mt-4 p-1">
 
-<h4 className="text-sm text-center font-semibold text-gray-900 dark:text-white">Sender Details</h4>
-<SenderForm></SenderForm>
+<h4 className="text-sm text-center font-semibold text-gray-900 dark:text-white pt-4">Sender Details</h4>
+<form className="space-y-4" >
+    <div>
+<label  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Full Name</label>
+<input type="text"  onChange={((e)=>{
+  setFname(e.target.value);
+})}
+ className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
+ placeholder="John Doe" required />
+</div>
+    <div>
+{/*<label  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Last Name</label>
+ <input type="text" onChange={((e)=>{
+   setLname(e.target.value);
+ })}
+  placeholder="Doe" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required />
+ </div>
+<div>*/}
+<label  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
+ <input type="tel" onChange={((e)=>{
+ setPMobileNumber(e.target.value);
+ })}
+  placeholder="Doe" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required />
+ </div>
+</form>
 <div className="relative w-auto">
             <input type="text" id="search-dropdown" className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg rounded-s-gray-100 rounded-s-2 border border-gray-300 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-orange-500" placeholder="Enter Coupon" />
             <button  className="absolute top-0 end-0 p-2.5 h-full text-sm font-medium text-white bg-neutral-800 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
@@ -140,25 +181,33 @@ set(ref(db,'orders/'+uid),{
 
             </button>
         </div>
-        <button type="button" 
-            className={clsx(
-                "w-full text-white bg-orange-500 hover:bg-orange-600 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center  dark:focus:ring-orange-600 dark:bg-orange-500 dark:border-orange-700 dark:text-white dark:hover:bg-orange-700 me-2 mb-2 ",
-                {
-                 //   'hidden': user ==null,
-                 //   'block': user !== null
-            })}
-            >
-            Book Delivery
-            </button>
         <div className={
-            clsx({
-               // 'hidden': user !==null,
-               // 'block': user ==null,
+            clsx(
+                
+                {
+               'hidden':user ===null,
+                'block': user !== null
+            })
+        }>
+              <button onClick={()=>{
+                saveItem()
+              }} type="button" 
+            className="w-full text-white bg-orange-500 hover:bg-orange-600 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center  dark:focus:ring-orange-600 dark:bg-orange-500 dark:border-orange-700 dark:text-white dark:hover:bg-orange-700 me-2 mb-2 "
+            >
+             Book Delivery
+            </button>
+            </div>
+        <div className={
+            clsx(
+                
+                {
+                'block':user ===null,
+                'hidden': user !==null
             })
         }>
         <p id="helper-text-explanation" 
         className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Create Account for seameless experience.
+            Create Account To for seameless experience.
 </p>
 
         <div className="grid grid-rows-2 gap-2">
@@ -178,23 +227,33 @@ Just Book Delivery
         </div>
         </div>
         </Card>
-<div id="toast-success" className={
+ {/* <div id="toast-success" className={
     clsx(
-        "hidden",
+        'absolute top-4',
         
          {
-            "block flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800":  status === 'success'
+            "flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800":  status === 'success',
+            "hidden": status === null
          }
     )
-}
- role="alert">
+} role="alert">
+ <div  >
     <div className="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
         <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
             <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
         </svg>
         <span className="sr-only">Check icon</span>
     </div>
+    <div className="p-2 text-sm font-normal">
+    </div>
+    <button type="button" className="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-success" aria-label="Close">
+        <span className="sr-only">Close</span>
+        <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+        </svg>
+    </button>
 </div>
+</div>*/}
 </div>
     );
-   }
+}

@@ -16,7 +16,7 @@ export interface SenderDetails{
     sender_name: String,
     sender_phone: String,
     sender_email?: String,
-    sender_id: String,
+    sender_id?: String,
 }
 export interface ItemDetails{
     tracking_id?: String,

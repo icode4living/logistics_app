@@ -31,7 +31,7 @@ export const createNewUserWithEmailAndPassword = ((email:string, password:string
 
  alert("Thanks for signing up with us!");
  setTimeout(()=>{
-  navigate("/dashboard",{replace:true}),
+  location.replace('/dashboard');
   2000
 })
 
@@ -64,8 +64,8 @@ export const signInWithEmail =((email:string, password:string)=>
     dispatch(setIsAuthenticated(true));
     dispatch(setAuthToken(user.uid));*/
     // ...
-    localStorage.setItem("email", JSON.stringify(user.email))
-    localStorage.setItem("isAuthenticated", JSON.stringify(true))
+   
+    location.replace('/dashboard');
 
   })
   .catch((error) => {

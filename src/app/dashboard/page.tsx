@@ -1,8 +1,8 @@
 'use client';
 export default function Dashbord(){
     return (
-        <section className="w-full md:flex lg:flex lg:justify-items-center md:justify-items-center overflow-hidden p-2 md:p-0 lg:p-0">
-            <div className="flex justify-between">
+        <section className="w-full md:p-12 lg:p-12 lg:justify-items-center md:justify-items-center overflow-hidden p-2 md:p-0 lg:p-0">
+            <div className="flex justify-between md:w-auto">
                 <div className="flex p-4">
                 <div className="relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
     <svg className="absolute w-12 h-12 text-gray-400 -left-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
@@ -33,7 +33,7 @@ export default function Dashbord(){
             <div className="p-2 ">
             <h2 className="text-neutral-500 text-xl md:text-center lg:text-center text-justify text-pretty py-4">What would you like to do now?</h2>
             <div className="grid grid-cols-2 gap-2 md:gap-4 lg:gap-4 md:grid-cols-3 lg:grid-cols-3 ">
-                <a className=" p-8 lg:pointer-events-auto lg:p-12 md-12 shadow-md
+                <a className=" p-8 lg:p-12 md-12 shadow-md
                  hover:border-orange-400 hover:border rounded-sm hover:text-orange-500 h-4/5"
                 href="/send_package" >
                     <div className="flex  gap-2 justify-items-center flex-wrap">
@@ -42,9 +42,9 @@ export default function Dashbord(){
                         <h5 className="text-sm text-neutral-700 font-bold pt-1"> Send Package</h5>
                     </div>
                 </a>
-                <a className="pointer-events-none  p-8 lg:pointer-events-auto lg:p-0 shadow-md
+                <a className="p-8  lg:p-0 shadow-md
                  hover:border-orange-400 hover:border rounded-sm hover:text-orange-500 h-4/5"
-                href="#" target="_blank">
+                href="/schedule_delivery" >
                     <div className="flex place-items-center gap-2 flex-wrap justify-items-center">
                     <img src="/schedule_package.png" alt="Toboros logistics-schedule your delivery"/>
 
