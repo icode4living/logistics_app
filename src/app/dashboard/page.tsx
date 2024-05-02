@@ -1,5 +1,42 @@
 'use client';
+import { app } from "@/lib/firebase_config";
+import clsx from "clsx";
+import { getAuth,} from "firebase/auth";
+import { getDatabase, ref, onValue } from "firebase/database";
+import { Component, useEffect, useState } from "react";
+
+
 export default function Dashbord(){
+    
+    const auth = getAuth(app);
+    const user = auth.currentUser;
+    const db = getDatabase(app);
+    const [providerId, setProviderId] = useState('');
+    useEffect(()=>{
+    if (user !== null) {
+        user.providerData.forEach((profile) => {
+         console.log("Sign-in provider: " + profile.providerId);
+          console.log("  Provider-specific UID: " + profile.uid);
+          console.log("  Name: " + profile.displayName);
+          console.log("  Email: " + profile.email);
+          console.log("  Photo URL: " + profile.photoURL);
+          //setUid(JSON.stringify(profile.uid));
+          setProviderId(profile.providerId);
+        
+        });
+        const userId = user.uid;
+        console.log(userId)
+
+        return onValue(ref(db, '/users/' + userId), (snapshot) => {
+          const username = (snapshot.val() && snapshot.val().username) || 'Anonymous';
+          console.log(username)
+          // ...
+        }, {
+          onlyOnce: true
+        });
+    }
+   
+    })
     return (
         <section className="w-full md:p-12 lg:p-12 lg:justify-items-center md:justify-items-center overflow-hidden p-2 md:p-0 lg:p-0">
             <div className="flex justify-between md:w-auto">
@@ -64,6 +101,22 @@ export default function Dashbord(){
 
             </div>
 
+            </div>
+            <div className={clsx(
+                {
+                'block': providerId === 'Anonymous' || user === null,
+               'hidden': providerId == 'Firebase' || providerId === 'Facebook' || providerId ==='Google'
+            })}>
+            <h2 className="pb-4 text-lg text-center text-neutral-500"> You are not logged in</h2>
+
+            <div className="flex items-center flex-row items-center justify-evenly">
+                <a href="/create_account" className="focus:outline-none text-white bg-orange-500 hover:bg-orange-500 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-yellow-900">
+                    Sign Up
+                </a>
+                <a href="/login" className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+                Login
+                </a>
+            </div>
             </div>
             <div className="mb-4 p-4">
                 <h2 className="text-lg text-justify text-neutral-500"> Recent Deliveries</h2>

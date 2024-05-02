@@ -10,14 +10,15 @@ import { ItemDetails,SenderDetails } from "@/lib/model/packag_details";
 import clsx from "clsx";
 //import {useNavigate} from 'react-router-dom';
 //import { auth } from "firebaseui" ;
-const auth = getAuth(app);
-   const user = auth.currentUser;
+
+
 export default function ScheduleDeliverySummary(){
+  
     const receiver = useAppSelector((state)=>state.item);
     const [uid, setUid] = useState('');
     const [fname, setFname] = useState('');
     const [mobileNumber, setPMobileNumber] = useState('');
-   
+   //const userID = localStorage.getItem('uid')
     const date = new Date();
      let day = date.getDate()
      let month =  date.getMonth()+1.
@@ -27,8 +28,10 @@ export default function ScheduleDeliverySummary(){
     const codes =day + month + year+randomCode.toString();
    // setCode(codes)
    //const dsp = dispatch();
-   
-  
+   //let userID = localStorage.getItem('uid')
+
+   const auth = getAuth(app);
+   const user = auth.currentUser;
    if (user !== null) {
     user.providerData.forEach((profile) => {
       console.log("Sign-in provider: " + profile.providerId);
@@ -36,11 +39,12 @@ export default function ScheduleDeliverySummary(){
       console.log("  Name: " + profile.displayName);
       console.log("  Email: " + profile.email);
       console.log("  Photo URL: " + profile.photoURL);
-      setUid(JSON.stringify(profile.uid));
+     // setUid(JSON.stringify(profile.uid));
+     console.log('uid=>',user.uid)
     
     });
 }
-console.log('uid=>',uid)
+console.log('uid=>',user?.uid)
    const order: ItemDetails ={
     tracking_id: codes,
     item_type:receiver.item_type,
@@ -83,11 +87,14 @@ const  saveItemWithAnonymous=(()=>{
   //  dsp(setAuthToken(result.user.uid))
 //const uid = result.user.uid;
         const db =getDatabase(app);
+const uid = result.uid
 //setSatus( 'success');
-set(ref(db,'orders/'+uid+'/'+ codes.toString()),{
+set(ref(db,'orders/'+uid),{
     order
     
 
+}).then((result)=>{
+    localStorage.setItem('order_number', codes);
 })
 .catch((error)=>{
     const errorCode = error.code();
@@ -99,7 +106,7 @@ set(ref(db,'orders/'+uid+'/'+ codes.toString()),{
 
 })
 const  saveItem=(()=>{
-   console.log(order)
+   //console.log(order)
    //const uid = result.user.uid;
         const db =getDatabase(app);
  set(ref(db,'orders/'+uid+'/'+codes.toString()),{

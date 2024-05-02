@@ -7,8 +7,14 @@ import { getDatabase } from 'firebase/database';
 export default function ScheduleDelivery(){
 const delivery = [];
     return(
-        <div>
-
+        <div className='relative flex min-h-screen flex-col items-center'>
+ {
+    delivery.length <=0?
+<p className='mb-8 text-lg font-normal text-gray-400 lg:text-xl dark:text-gray-200 text-center'>
+    You have no delivery on your schedule at the moment
+</p>:
+null
+}
 <button onClick={
     ()=>{
         location.replace('/add')

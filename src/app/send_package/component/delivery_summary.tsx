@@ -87,15 +87,29 @@ set(ref(db,'orders/'+uid),{
     order
     
 
+}).then((result)=>{
+console.log(result);
+alert("Delivery booked successfuly with order number: "+codes)
 })
 .catch((error)=>{
     const errorCode = error.code();
     const errorMessage = error.message;
 
     alert(errorMessage);
-})
+}),
+set(ref(db,'users/'+ result.providerId),{
+    full_name: receiver.sender.sender_name,
+    email:receiver.sender.sender_email,
+    phone:receiver.sender.sender_phone,
+    uid:result
+    
+
+}).then((result)=>{
+ console.log(result);
     })
 
+
+    })
 })
     
     
@@ -144,8 +158,8 @@ set(ref(db,'orders/'+uid),{
             className={clsx(
                 "w-full text-white bg-orange-500 hover:bg-orange-600 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center  dark:focus:ring-orange-600 dark:bg-orange-500 dark:border-orange-700 dark:text-white dark:hover:bg-orange-700 me-2 mb-2 ",
                 {
-                 //   'hidden': user ==null,
-                 //   'block': user !== null
+                   'hidden': user ==null,
+                   'block': user !== null
             })}
             >
             Book Delivery

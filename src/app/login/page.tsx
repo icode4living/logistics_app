@@ -20,8 +20,12 @@ export default function LoginForm(){
     //const user = acct((state)=>state.auth);
    // const isLogin = user.isAuthenticated;
    const dispatch = acct();
+  
    const auth = getAuth(app);
-const user = auth.currentUser;
+   const user = auth.currentUser;
+if(!signInWithEmail){
+    setBtnTitle("Login to your account")
+}
 
 if (user !== null) {
   user.providerData.forEach((profile) => {
@@ -30,9 +34,9 @@ if (user !== null) {
     console.log("  Name: " + profile.displayName);
     console.log("  Email: " + profile.email);
     console.log("  Photo URL: " + profile.photoURL);
-    dispatch(setIsAuthenticated(true));
+   /* dispatch(setIsAuthenticated(true));
     dispatch(setEmail(profile.email));
-    dispatch(setFirstName(profile.displayName))
+    dispatch(setFirstName(profile.displayName))*/
   });
 }
     return(
@@ -56,9 +60,11 @@ if (user !== null) {
             </div>
             <div className="p-4 md:p-5">
                 <form className="space-y-4" onSubmit={(e)=>{
+                setClick(true);
+
                     e.preventDefault();
                     //createAccount();
-                    setClick(true)
+                    setBtnTitle("Please wait..");
 
                     signInWithEmail(email, password);
                 }}>
@@ -71,28 +77,32 @@ if (user !== null) {
                     </div>
                     <div>
                         <label  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your password</label>
-                        <input onChange={(e)=>{
+                        <input type="password" onChange={(e)=>{
                            setPassword(e.target.value)
                         }} id="password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required />
 
                     </div>
+
                    
-                    <div className="flex justify-between">
+                     <div className="flex justify-between">
                         <div className="flex items-start">
-                            <div className="flex items-center h-5">
+                         {/* <div className="flex items-center h-5">
                                 <input id="remember" type="checkbox" value="" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-600 dark:border-gray-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800" required />
                             </div>
-                            <label  className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Remember me</label>
-                        </div>
+                    <label  className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Remember me</label>*/}
+                    </div>
                        {/* <a href="#" className="text-sm text-orange-600 hover:underline dark:text-blue-500">Lost Password?</a>*/}
                     </div>
-                    <button type="submit" className="w-full text-white bg-orange-600 hover:bg-orange-700 focus:ring-4 focus:outline-none focus:ring-orange-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-orange-600 dark:hover:bg-orange-600 dark:focus:ring-orange-800">Login to your account
+                    <button 
+                    type="submit" className="w-full text-white bg-orange-600 hover:bg-orange-700 focus:ring-4 focus:outline-none focus:ring-orange-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-orange-600 dark:hover:bg-orange-600 dark:focus:ring-orange-800">{btnTitle}
                     <svg aria-hidden="true" role="status" 
                     className={
                         clsx(
-                            'hidden',
+                            
                             {
-                        'block inline w-4 h-4 me-3 text-white animate-spin': click
+                        'block inline w-4 h-4 me-3 text-white animate-spin': click,
+                        'hidden': !click
+
                             })
                     } viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB"/>

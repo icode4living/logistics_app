@@ -7,6 +7,7 @@ import { setAuthToken,setDisplayName,setEmail,setPhone,
 //import { AuthResult } from "@/lib/store/authSlice";
 import { useEffect } from "react";
 import {useNavigate} from 'react-router-dom'
+import { getDatabase,set, ref,push } from "firebase/database";
 
 import Alert from "../create_account/component/alert";
 import { FacebookAuthProvider } from "firebase/auth/cordova";
@@ -16,12 +17,11 @@ import { json } from "stream/consumers";
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 //create new user
-export const createNewUserWithEmailAndPassword = ((email:string, password:string,
+export const createNewUserWithEmailAndPassword = ((email:string, password:string,fname:string, phone:string
   
 )=>createUserWithEmailAndPassword(auth, email, password)
 .then((userCredential) => {
   //Save value in local storage
-  let navigate = useNavigate();
 
   const user = userCredential.user;
   localStorage.setItem("email", JSON.stringify(user.email));
@@ -29,11 +29,33 @@ export const createNewUserWithEmailAndPassword = ((email:string, password:string
   localStorage.setItem("token", JSON.stringify(user.getIdToken));
   localStorage.setItem("isAuthenticated", JSON.stringify(true));
 
- alert("Thanks for signing up with us!");
- setTimeout(()=>{
-  location.replace('/dashboard');
-  2000
-})
+ const db =getDatabase(app);
+ 
+ set(ref(db,'users/'+ user.uid),{
+     full_name:fname,
+     email:email,
+     phone:phone,
+     uid:user.uid
+     
+ 
+ }).then((result)=>{
+  console.log(result);
+  alert("Thanks for signing up with us!")
+  signInWithEmailAndPassword(auth, email, password).then(()=>{
+    location.replace('/dashboard');
+
+  }).catch((error)=>{
+alert(error.message)
+  })
+
+ })
+ .catch((error)=>{
+     const errorCode = error.code();
+     const errorMessage = error.message;
+ 
+     alert(errorMessage);
+ })
+
 
   //localStorage.setItem("name", (user.displayName|| '').toString())
 
@@ -52,6 +74,7 @@ dispatch(setIsAuthenticated(true));*/
   // Todo remove this
   console.log(errorCode);
   console.log(errorMessage);
+  alert(errorMessage);
 }));
 //Login with username and email
 export const signInWithEmail =((email:string, password:string)=>
@@ -76,7 +99,7 @@ export const signInWithEmail =((email:string, password:string)=>
 alert(errorMessage)
     localStorage.setItem("isAuthenticated", JSON.stringify(false))
     //dispatch(setIsAuthenticated(true));
-
+return false
   })
 );
 
